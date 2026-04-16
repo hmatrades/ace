@@ -1,0 +1,40 @@
+{
+  "name": "ace-memory",
+  "version": "0.1.0",
+  "description": "ACE — Access · Compact · Execute. Subjective salience pointers for LLM memory. 195× compression vs content-based memory.",
+  "type": "module",
+  "main": "src/flag.js",
+  "bin": {
+    "flag": "src/flag.js"
+  },
+  "exports": {
+    ".": "./src/flag.js",
+    "./extract": "./src/extract.js",
+    "./graph": "./src/graph.js",
+    "./notes": "./src/notes.js",
+    "./store": "./src/store.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "bench": "node bench/recall.js",
+    "compact": "node scripts/compact-claude-mem.js",
+    "daemon:install": "bash scripts/setup-daemon.sh"
+  },
+  "keywords": ["memory", "llm", "compression", "claude", "salience", "attention", "claude-code"],
+  "author": "Aiden Heckera <heckeraiden@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.81.0"
+  },
+  "files": [
+    "src/",
+    "plugin/",
+    "scripts/",
+    "install.sh",
+    "README.md",
+    "LICENSE"
+  ]
+}
