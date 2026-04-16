@@ -1,7 +1,7 @@
 {
   "name": "ace-memory",
   "version": "0.1.0",
-  "description": "ACE — Access · Compact · Execute. Subjective salience pointers for LLM memory. 195× compression vs content-based memory.",
+  "description": "ACE — Access · Compact · Execute. Subjective salience pointers for LLM memory. 195× compression vs content-based memory systems.",
   "type": "module",
   "main": "src/flag.js",
   "bin": {
@@ -12,15 +12,35 @@
     "./extract": "./src/extract.js",
     "./graph": "./src/graph.js",
     "./notes": "./src/notes.js",
-    "./store": "./src/store.js"
+    "./store": "./src/store.js",
+    "./router": "./src/router.js"
   },
   "scripts": {
     "test": "node --test test/*.test.js",
     "bench": "node bench/recall.js",
+    "bench:generate": "node bench/recall.js --generate",
     "compact": "node scripts/compact-claude-mem.js",
-    "daemon:install": "bash scripts/setup-daemon.sh"
+    "daemon": "node src/daemon.js",
+    "daemon:once": "node src/daemon.js once",
+    "daemon:status": "node src/daemon.js status",
+    "daemon:install": "bash scripts/setup-daemon.sh install",
+    "hook:install": "bash scripts/install-plugin.sh install",
+    "hook:uninstall": "bash scripts/install-plugin.sh uninstall",
+    "install:all": "bash install.sh",
+    "prepublishOnly": "npm test"
   },
-  "keywords": ["memory", "llm", "compression", "claude", "salience", "attention", "claude-code"],
+  "keywords": [
+    "memory",
+    "llm",
+    "compression",
+    "claude",
+    "salience",
+    "attention",
+    "claude-code",
+    "agent-memory",
+    "context-compression",
+    "cognitive-architecture"
+  ],
   "author": "Aiden Heckera <heckeraiden@gmail.com>",
   "license": "MIT",
   "engines": {
@@ -35,6 +55,15 @@
     "scripts/",
     "install.sh",
     "README.md",
-    "LICENSE"
-  ]
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amotive/ace.git"
+  },
+  "homepage": "https://github.com/amotive/ace#readme",
+  "bugs": {
+    "url": "https://github.com/amotive/ace/issues"
+  }
 }
