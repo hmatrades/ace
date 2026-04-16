@@ -24,6 +24,7 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 import { recordPingSync, neighbors, cluster, formatNeighbors, formatCluster } from "./graph.js";
+import { readNote, listNotes, formatNote, formatNoteList } from "./notes.js";
 
 const FLAGS_PATH = join(homedir(), ".claude", "flags.json");
 const DEFAULT_HL = 21;
@@ -263,6 +264,26 @@ if (process.argv[1]?.endsWith("flag.js") || process.argv[1]?.endsWith("flag")) {
       console.log(formatCluster(arg1, cluster(arg1, arg2 ? parseInt(arg2) : 2)));
       break;
     }
+    case "note": {
+      if (!arg1) { console.error("usage: flag note <slug>"); process.exit(1); }
+      console.log(formatNote(readNote(arg1)));
+      break;
+    }
+    case "notes": {
+      console.log(formatNoteList(listNotes()));
+      break;
+    }
+    case "ingest": {
+      // flag ingest "observation text"
+      // Runs extraction + routes concepts to flags, facts to notes.
+      if (!arg1) { console.error("usage: flag ingest \"observation text\""); process.exit(1); }
+      const text = process.argv.slice(3).join(" ") ? `${arg1} ${process.argv.slice(3).join(" ")}` : arg1;
+      const { extractAndIngest } = await import("./router.js");
+      const r = await extractAndIngest(text);
+      console.log(`  pinged: ${r.pinged.join(", ") || "(none)"}`);
+      if (r.notes.length) console.log(`  notes:  ${r.notes.join(", ")}`);
+      break;
+    }
     default:
       console.log("flag — ACE salience pointers with decay + co-occurrence graph");
       console.log("");
@@ -273,6 +294,9 @@ if (process.argv[1]?.endsWith("flag.js") || process.argv[1]?.endsWith("flag")) {
       console.log("  flag eff <concept>                effective salience number");
       console.log("  flag graph <concept> [n]          show concept's top co-occurring neighbors");
       console.log("  flag cluster <concept> [depth]    expanded association cluster (BFS)");
+      console.log("  flag note <slug>                  view arbitrary-fact note");
+      console.log("  flag notes                        list all notes");
+      console.log("  flag ingest \"text\"                LLM-extract + route concepts/facts");
       console.log("  flag prune                        remove decayed flags");
       console.log("  flag simulate <concept> [days]    show decay curve");
       console.log("  flag export                       dump all flags as JSON");
