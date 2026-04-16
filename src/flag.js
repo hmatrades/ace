@@ -23,6 +23,7 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
+import { recordPingSync, neighbors, cluster, formatNeighbors, formatCluster } from "./graph.js";
 
 const FLAGS_PATH = join(homedir(), ".claude", "flags.json");
 const DEFAULT_HL = 21;
@@ -78,6 +79,8 @@ function ping(concept, halfLife) {
   } else {
     flags[c] = { hits: 1, seen: now, hl: halfLife || DEFAULT_HL };
   }
+  // A2: update co-occurrence graph in the same flags object, then save once
+  recordPingSync(c, flags);
   save(flags);
   return flags[c];
 }
@@ -250,14 +253,26 @@ if (process.argv[1]?.endsWith("flag.js") || process.argv[1]?.endsWith("flag")) {
       console.log("  all flags cleared");
       break;
     }
+    case "graph": {
+      if (!arg1) { console.error("usage: flag graph <concept>"); process.exit(1); }
+      console.log(formatNeighbors(arg1, neighbors(arg1, arg2 ? parseInt(arg2) : 10)));
+      break;
+    }
+    case "cluster": {
+      if (!arg1) { console.error("usage: flag cluster <concept> [depth]"); process.exit(1); }
+      console.log(formatCluster(arg1, cluster(arg1, arg2 ? parseInt(arg2) : 2)));
+      break;
+    }
     default:
-      console.log("flag — subjective salience pointers with decay");
+      console.log("flag — ACE salience pointers with decay + co-occurrence graph");
       console.log("");
       console.log("commands:");
       console.log("  flag ping <concept> [half_life]   touch a concept (default hl=21d)");
       console.log("  flag recall <concept>             look up salience + stance");
       console.log("  flag top [n]                      top N by effective salience");
       console.log("  flag eff <concept>                effective salience number");
+      console.log("  flag graph <concept> [n]          show concept's top co-occurring neighbors");
+      console.log("  flag cluster <concept> [depth]    expanded association cluster (BFS)");
       console.log("  flag prune                        remove decayed flags");
       console.log("  flag simulate <concept> [days]    show decay curve");
       console.log("  flag export                       dump all flags as JSON");

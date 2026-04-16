@@ -267,8 +267,9 @@ test("simulate returns decay curve", () => {
 test("help shows when no command given", () => {
   const env = mkEnv();
   const r = runFlag(env, []);
-  assert.match(r.stdout, /flag — subjective salience pointers/);
+  assert.match(r.stdout, /flag — ACE salience pointers/);
   assert.match(r.stdout, /ping/);
   assert.match(r.stdout, /recall/);
+  assert.match(r.stdout, /graph/);
   cleanup(env);
 });
