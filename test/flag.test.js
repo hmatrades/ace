@@ -142,7 +142,26 @@ test("decay: 4 half-lives reduces to ~6%", () => {
   const now = dayNow();
   writeFlags(env, { x: { hits: 16, seen: now - 84, hl: 21 } });
   const r = runFlag(env, ["eff", "x"]);
-  assert.equal(Number(r.stdout.trim()), 1.0);
+  const got = Number(r.stdout.trim());
+  assert.ok(!isNaN(got), `eff returned non-numeric: "${r.stdout}" (stderr: "${r.stderr}")`);
+  assert.equal(got, 1.0);
+  cleanup(env);
+});
+
+test("eff returns 0 (not NaN) for malformed flag data", () => {
+  const env = mkEnv();
+  // Write deliberately broken flag entries — eff must degrade gracefully
+  writeFlags(env, {
+    missing_hits: { seen: dayNow(), hl: 21 },
+    nan_seen: { hits: 5, seen: NaN, hl: 21 },
+    zero_hl: { hits: 5, seen: dayNow(), hl: 0 },
+    missing_hl: { hits: 5, seen: dayNow() },
+  });
+  for (const key of ["missing_hits", "nan_seen", "zero_hl", "missing_hl"]) {
+    const r = runFlag(env, ["eff", key]);
+    const got = Number(r.stdout.trim());
+    assert.ok(!isNaN(got), `${key}: got "${r.stdout}"`);
+  }
   cleanup(env);
 });
 

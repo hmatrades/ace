@@ -19,10 +19,14 @@ export function dayNow() {
 }
 
 // ── Decay math ──
+// Defensive: missing or bad fields return 0 to prevent NaN propagation.
 export function effective(f) {
-  const idle = dayNow() - f.seen;
+  if (!f || typeof f.hits !== "number" || isNaN(f.hits)) return 0;
+  const seen = typeof f.seen === "number" && !isNaN(f.seen) ? f.seen : dayNow();
+  const hl = typeof f.hl === "number" && f.hl > 0 ? f.hl : DEFAULT_HL;
+  const idle = dayNow() - seen;
   if (idle <= 0) return f.hits;
-  return f.hits * Math.pow(0.5, idle / f.hl);
+  return f.hits * Math.pow(0.5, idle / hl);
 }
 
 export function stance(eff) {
