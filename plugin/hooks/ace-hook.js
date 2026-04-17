@@ -39,6 +39,27 @@ function stanceOf(eff) {
   return "faded";
 }
 
+// In-process ping batch for user-prompt mode. Replaces N spawnSync("flag",
+// "ping", c) calls (~50ms each) with a single pass: N hits bumps, N cooc
+// updates through recordPingSync, one flags.json write at the end.
+async function batchPing(concepts) {
+  if (!concepts.length) return;
+  const { saveFlags } = await import("../../src/store.js");
+  const { recordPingSync } = await import("../../src/graph.js");
+  const flags = loadFlags();
+  const now = dayNow();
+  for (const c of concepts) {
+    if (flags[c]) {
+      flags[c].hits++;
+      flags[c].seen = now;
+    } else {
+      flags[c] = { hits: 1, seen: now, hl: 21 };
+    }
+    recordPingSync(c, flags);
+  }
+  saveFlags(flags);
+}
+
 // ── Render the $ACE block ──
 function renderContext(flags, opts = {}) {
   const { topN = 12, clustersN = 3 } = opts;
@@ -132,13 +153,10 @@ function emitUserPrompt() {
       if (new RegExp(`\\b${slug}\\b`, "i").test(text)) toBump.push(c);
     }
 
-    if (toBump.length) {
-      // Use the live flag CLI so cooc graph gets updated too
-      const { spawnSync } = await import("child_process");
-      for (const c of toBump) {
-        spawnSync("flag", ["ping", c], { stdio: "ignore" });
-      }
-    }
+    // In-process batch: one flags.json write for the whole prompt instead
+    // of N subprocess spawns. Fire-and-forget — swallow errors since the
+    // hook is side-effect-only and must not block the user's prompt.
+    try { await batchPing(toBump); } catch {}
 
     // Emit empty context — the point is the ping side effect
     process.stdout.write(JSON.stringify({ continue: true }));

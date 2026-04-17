@@ -3,7 +3,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -90,6 +90,26 @@ test("user-prompt mode returns continue signal without crashing", () => {
   assert.equal(r.status, 0);
   const parsed = JSON.parse(r.stdout);
   assert.equal(parsed.continue, true);
+  rmSync(home, { recursive: true, force: true });
+});
+
+test("user-prompt mode pings matched concepts in-process (batched)", () => {
+  const home = mkEnv({
+    outreach: { hits: 5, seen: day, hl: 21 },
+    gmail_api: { hits: 3, seen: day, hl: 21 },
+    never_mentioned: { hits: 2, seen: day, hl: 21 },
+  });
+  const r = runHook(
+    home,
+    "user-prompt",
+    JSON.stringify({ prompt: "kicking off outreach with gmail_api today" })
+  );
+  assert.equal(r.status, 0);
+  const flagsPath = join(home, ".claude", "flags.json");
+  const flags = JSON.parse(readFileSync(flagsPath, "utf8"));
+  assert.equal(flags.outreach.hits, 6, "matched concept should increment");
+  assert.equal(flags.gmail_api.hits, 4, "second matched concept should increment");
+  assert.equal(flags.never_mentioned.hits, 2, "unmatched concept stays put");
   rmSync(home, { recursive: true, force: true });
 });
 
