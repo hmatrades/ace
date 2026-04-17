@@ -42,12 +42,16 @@ function stanceOf(eff) {
 // In-process ping batch for user-prompt mode. Replaces N spawnSync("flag",
 // "ping", c) calls (~50ms each) with a single pass: N hits bumps, N cooc
 // updates through recordPingSync, one flags.json write at the end.
+//
+// Self-sufficient via store.js imports — doesn't reach into the hook's
+// local helpers, so it survives the ACEv2 render-compaction rebase that
+// drops those locals in favor of the store.js exports.
 async function batchPing(concepts) {
   if (!concepts.length) return;
-  const { saveFlags } = await import("../../src/store.js");
+  const store = await import("../../src/store.js");
   const { recordPingSync } = await import("../../src/graph.js");
-  const flags = loadFlags();
-  const now = dayNow();
+  const flags = store.loadFlags();
+  const now = store.dayNow();
   for (const c of concepts) {
     if (flags[c]) {
       flags[c].hits++;
@@ -57,7 +61,7 @@ async function batchPing(concepts) {
     }
     recordPingSync(c, flags);
   }
-  saveFlags(flags);
+  store.saveFlags(flags);
 }
 
 // ── Render the $ACE block ──
