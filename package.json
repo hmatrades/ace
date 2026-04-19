@@ -1,0 +1,69 @@
+{
+  "name": "ace-memory",
+  "version": "0.1.0",
+  "description": "ACE — Access · Compact · Execute. Subjective salience pointers for LLM memory. 195× compression vs content-based memory systems.",
+  "type": "module",
+  "main": "src/flag.js",
+  "bin": {
+    "flag": "src/flag.js"
+  },
+  "exports": {
+    ".": "./src/flag.js",
+    "./extract": "./src/extract.js",
+    "./graph": "./src/graph.js",
+    "./notes": "./src/notes.js",
+    "./store": "./src/store.js",
+    "./router": "./src/router.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "bench": "node bench/recall.js",
+    "bench:generate": "node bench/recall.js --generate",
+    "compact": "node scripts/compact-claude-mem.js",
+    "daemon": "node src/daemon.js",
+    "daemon:once": "node src/daemon.js once",
+    "daemon:status": "node src/daemon.js status",
+    "daemon:install": "bash scripts/setup-daemon.sh install",
+    "hook:install": "bash scripts/install-plugin.sh install",
+    "hook:uninstall": "bash scripts/install-plugin.sh uninstall",
+    "install:all": "bash install.sh",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "memory",
+    "llm",
+    "compression",
+    "claude",
+    "salience",
+    "attention",
+    "claude-code",
+    "agent-memory",
+    "context-compression",
+    "cognitive-architecture"
+  ],
+  "author": "Aiden Hecker <heckeraiden@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.81.0"
+  },
+  "files": [
+    "src/",
+    "plugin/",
+    "scripts/",
+    "install.sh",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hmatrades/ace.git"
+  },
+  "homepage": "https://github.com/hmatrades/ace#readme",
+  "bugs": {
+    "url": "https://github.com/hmatrades/ace/issues"
+  }
+}

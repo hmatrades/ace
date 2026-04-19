@@ -1,0 +1,181 @@
+[
+  {
+    "query": "did I work on homepage verified live at localhost:8905 with complete redesign?",
+    "expect_id": 24,
+    "expect_keywords": [
+      "homepage",
+      "verified",
+      "localhost:8905"
+    ]
+  },
+  {
+    "query": "did I work on complete $10k flagship tier with premium features?",
+    "expect_id": 205,
+    "expect_keywords": [
+      "complete",
+      "flagship",
+      "premium"
+    ]
+  },
+  {
+    "query": "did I work on agency repository cleanup removes 39mb venv and expands gitignore?",
+    "expect_id": 707,
+    "expect_keywords": [
+      "agency",
+      "repository",
+      "cleanup"
+    ]
+  },
+  {
+    "query": "did I work on key open-source meeting copilot projects identified with high star counts?",
+    "expect_id": 125,
+    "expect_keywords": [
+      "open-source",
+      "meeting",
+      "copilot"
+    ]
+  },
+  {
+    "query": "did I work on webhook endpoint successfully accepting pine script signals?",
+    "expect_id": 518,
+    "expect_keywords": [
+      "webhook",
+      "endpoint",
+      "successfully"
+    ]
+  },
+  {
+    "query": "did I work on oauth setup cli tool for gmail inbox authorization?",
+    "expect_id": 270,
+    "expect_keywords": [
+      "oauth",
+      "setup",
+      "gmail"
+    ]
+  },
+  {
+    "query": "did I work on sent 4 live outreach emails from batch_deep_dive_10 after clearing phantom tracker entries?",
+    "expect_id": 464,
+    "expect_keywords": [
+      "outreach",
+      "emails",
+      "batch_deep_dive_10"
+    ]
+  },
+  {
+    "query": "did I work on integrated claude-trader webhook calls into run_full_scan execution flow?",
+    "expect_id": 444,
+    "expect_keywords": [
+      "integrated",
+      "claude-trader",
+      "webhook"
+    ]
+  },
+  {
+    "query": "did I work on wolf of wall street personality enhancements to trading agent?",
+    "expect_id": 505,
+    "expect_keywords": [
+      "street",
+      "personality",
+      "enhancements"
+    ]
+  },
+  {
+    "query": "did I work on macos packet filter firewall configured to block airplay ports?",
+    "expect_id": 807,
+    "expect_keywords": [
+      "macos",
+      "packet",
+      "filter"
+    ]
+  },
+  {
+    "query": "did I work on contact page with cta-focused layout?",
+    "expect_id": 20,
+    "expect_keywords": [
+      "contact",
+      "cta-focused",
+      "layout"
+    ]
+  },
+  {
+    "query": "did I work on lead database segmentation reveals 691 cold-callable prospects and vertical distribution?",
+    "expect_id": 423,
+    "expect_keywords": [
+      "database",
+      "segmentation",
+      "reveals"
+    ]
+  },
+  {
+    "query": "did I work on oc-model-usage skill tracks per-model costs via codexbar?",
+    "expect_id": 283,
+    "expect_keywords": [
+      "oc-model-usage",
+      "skill",
+      "tracks"
+    ]
+  },
+  {
+    "query": "did I work on asus official guidance for windows installation drive detection issues?",
+    "expect_id": 634,
+    "expect_keywords": [
+      "official",
+      "guidance",
+      "windows"
+    ]
+  },
+  {
+    "query": "did I work on 24gb of python virtual environments identified as regenerable cleanup targets?",
+    "expect_id": 731,
+    "expect_keywords": [
+      "python",
+      "virtual",
+      "environments"
+    ]
+  },
+  {
+    "query": "did I work on talon brain is a custom trading-focused transformer model?",
+    "expect_id": 612,
+    "expect_keywords": [
+      "talon",
+      "brain",
+      "custom"
+    ]
+  },
+  {
+    "query": "did I work on route skill project memory documented?",
+    "expect_id": 306,
+    "expect_keywords": [
+      "route",
+      "skill",
+      "project"
+    ]
+  },
+  {
+    "query": "did I work on test to match updated cli help text?",
+    "expect_id": 857,
+    "expect_keywords": [
+      "match",
+      "updated"
+    ]
+  },
+  {
+    "query": "did I work on end-to-end ingestion pipeline successfully processes complex observations?",
+    "expect_id": 866,
+    "expect_keywords": [
+      "end-to-end",
+      "ingestion",
+      "pipeline"
+    ]
+  },
+  {
+    "query": "did I work on consolidated batch emails into send queue?",
+    "expect_id": 686,
+    "expect_keywords": [
+      "consolidated",
+      "batch",
+      "emails"
+    ]
+  }
+]
