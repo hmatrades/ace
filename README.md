@@ -64,7 +64,7 @@ ACE is not a drop-in replacement for the others — **it's the attention layer o
 
 ```bash
 # Clone + install
-git clone https://github.com/amotiove/ace.git
+git clone https://github.com/hmatrades/ace.git
 cd ace
 npm install
 
@@ -185,5 +185,5 @@ MIT
 
 ## Credits
 
-Designed by [Ace](https://github.com/amotiove) × Claude.
+Designed by [Ace](https://github.com/hmatrades) × Claude.
 Built on the observation that **every memory system stores content. The human brain stores activation.**
