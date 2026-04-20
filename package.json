@@ -42,7 +42,7 @@
     "cognitive-architecture"
   ],
   "author": "Aiden Hecker <heckeraiden@gmail.com>",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "engines": {
     "node": ">=18"
   },

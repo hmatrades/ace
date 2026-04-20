@@ -5,6 +5,8 @@
 > Subjective salience pointers + decay + co-occurrence graph.
 > ~300 tokens covers what used to take ~17,000.
 
+> **Source-available, noncommercial.** You may read, study, and use ACE for personal / research / nonprofit purposes. Commercial use requires a separate license — contact heckeraiden@gmail.com. See [LICENSE](LICENSE) for full terms.
+
 ACE is a new memory architecture for LLM agents. Instead of storing the content of past interactions (transcripts, summaries, observations), it stores only the **subjective salience** of each concept — how much it matters, how recently, and what it tends to appear with. The model's own weights supply meaning at recall time. The flag store supplies *attention*.
 
 ```
@@ -181,7 +183,14 @@ npm run bench     # recall + context size comparison
 
 ## License
 
-MIT
+**PolyForm Noncommercial 1.0.0** — source-available, noncommercial use only.
+
+Commercial use (including using ACE inside a commercial AI product to reduce
+context / memory costs) requires a separate commercial license. Email
+**heckeraiden@gmail.com** to inquire — commercial licenses are available at
+reasonable terms.
+
+Full terms: [LICENSE](LICENSE). License text: <https://polyformproject.org/licenses/noncommercial/1.0.0>.
 
 ## Credits
 
