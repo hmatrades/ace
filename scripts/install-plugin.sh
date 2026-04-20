@@ -40,11 +40,13 @@ case "$cmd" in
       s.hooks = s.hooks || {};
 
       const ctx = {
-        matcher: 'startup|clear|compact',
         hooks: [{ type: 'command', command: 'node \"$HOOK_SCRIPT\" context', timeout: 15 }],
       };
       const up = {
         hooks: [{ type: 'command', command: 'node \"$HOOK_SCRIPT\" user-prompt', timeout: 10 }],
+      };
+      const stop = {
+        hooks: [{ type: 'command', command: 'node \"$HOOK_SCRIPT\" stop-session', timeout: 20 }],
       };
 
       s.hooks.SessionStart = (s.hooks.SessionStart || []).filter(h =>
@@ -57,8 +59,13 @@ case "$cmd" in
       );
       s.hooks.UserPromptSubmit.push(up);
 
+      s.hooks.StopSession = (s.hooks.StopSession || []).filter(h =>
+        !(h.hooks||[]).some(e => (e.command||'').includes('ace-hook.js'))
+      );
+      s.hooks.StopSession.push(stop);
+
       fs.writeFileSync(path, JSON.stringify(s, null, 2));
-      console.log('✓ ACE hooks added to ' + path);
+      console.log('✓ ACE hooks added to ' + path + ' (SessionStart + UserPromptSubmit + StopSession)');
     "
     echo ""
     echo "Next session start will include a \$ACE block at the top of Claude's context."

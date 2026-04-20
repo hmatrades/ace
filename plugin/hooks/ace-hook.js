@@ -5,12 +5,16 @@
 //   { hookSpecificOutput: { hookEventName, additionalContext } }
 //
 // SessionStart (context): injects a $ACE block showing top flags + clusters
-//   for the model to see at session boot. Replaces / supplements $CMEM.
+//   for the model to see at session boot.
 //
-// UserPromptSubmit: light ping pass — detects concept keywords in the user's
-//   message and increments their flags. Over time builds attention graph.
+// UserPromptSubmit: light ping — detects concept keywords in user message,
+//   increments their flags. Builds attention graph over time.
 //
-// Designed to be fast (<300ms typical, 15s hard timeout via hooks.json).
+// StopSession: deep extraction — reads full conversation from stdin, extracts
+//   all concepts (files, tools, topics), pings flags. This is how ACE learns
+//   what was actually worked on, not just what the user typed.
+//
+// Designed to be fast (<300ms typical, 15s hard timeout).
 
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -133,6 +137,7 @@ function emitContext() {
     },
   };
   process.stdout.write(JSON.stringify(output));
+  process.exit(0);
 }
 
 // ── Mode: user-prompt ──
@@ -160,16 +165,82 @@ function emitUserPrompt() {
     // In-process batch: one flags.json write for the whole prompt instead
     // of N subprocess spawns. Fire-and-forget — swallow errors since the
     // hook is side-effect-only and must not block the user's prompt.
-    try { await batchPing(toBump); } catch {}
+    try { await batchPing(toBump); } catch (e) { process.stderr.write(`ACE ping failed: ${e.message}\n`); }
 
     // Emit empty context — the point is the ping side effect
     process.stdout.write(JSON.stringify({ continue: true }));
   });
 }
 
+// ── Mode: stop-session ──
+// Reads full conversation JSON from stdin (Claude Code StopSession payload),
+// extracts every meaningful concept, pings flags. This is the autonomous
+// compilation pass — runs after every session ends.
+function emitStopSession() {
+  let input = "";
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (d) => (input += d));
+  process.stdin.on("end", async () => {
+    // Pull all text from the conversation payload
+    let allText = "";
+    try {
+      const payload = JSON.parse(input);
+      // Claude Code sends { messages: [...] } or { transcript: [...] }
+      const msgs = payload.messages || payload.transcript || [];
+      for (const m of msgs) {
+        const content = Array.isArray(m.content) ? m.content : [m.content];
+        for (const c of content) {
+          if (typeof c === "string") allText += " " + c;
+          else if (c?.text) allText += " " + c.text;
+          else if (c?.content) allText += " " + c.content;
+        }
+      }
+      // Also grab any top-level text fields
+      if (payload.summary) allText += " " + payload.summary;
+    } catch {
+      // Fallback: treat stdin as raw text
+      allText = input;
+    }
+
+    if (!allText.trim()) {
+      process.stdout.write(JSON.stringify({ continue: true }));
+      return;
+    }
+
+    // Extract concepts: file paths, tool names, identifiers, topic words
+    const concepts = new Set();
+
+    // File paths (src/foo.ts, path/to/file.ext)
+    const fileRe = /\b(?:[\w.-]+\/)+[\w.-]+\.(?:ts|tsx|js|mjs|py|rs|go|md|json|yaml|yml|sh)\b/g;
+    for (const m of allText.matchAll(fileRe)) concepts.add(m[0].split("/").slice(-2).join("/").replace(/\.[^.]+$/, "").replace(/[^a-z0-9_-]/gi, "_").toLowerCase());
+
+    // camelCase / snake_case identifiers (functions, classes, variables)
+    const identRe = /\b([a-z][a-z0-9]*(?:[A-Z][a-z0-9]+){1,}|[a-z][a-z0-9_]{3,}(?:_[a-z0-9]+)+)\b/g;
+    for (const m of allText.matchAll(identRe)) {
+      const slug = m[1].replace(/([A-Z])/g, "_$1").toLowerCase().replace(/^_/, "");
+      if (slug.length >= 4 && slug.length <= 40) concepts.add(slug);
+    }
+
+    // Domain keywords: words that appear 3+ times (simple frequency signal)
+    const words = allText.toLowerCase().match(/\b[a-z]{4,20}\b/g) || [];
+    const freq = {};
+    const STOP = new Set(["that","this","with","from","have","been","they","when","what","your","will","more","than","some","into","then","also","just","like","very","here","there","about","would","could","should","their","which","where","other","these","those","after","before","over","under","between"]);
+    for (const w of words) { if (!STOP.has(w)) freq[w] = (freq[w] || 0) + 1; }
+    for (const [w, c] of Object.entries(freq)) { if (c >= 3) concepts.add(w); }
+
+    // Filter to meaningful concepts (not too generic)
+    const filtered = [...concepts].filter(c => c.length >= 4 && c.length <= 40 && !/^\d+$/.test(c));
+
+    try { await batchPing(filtered); } catch (e) { process.stderr.write(`ACE stop-session ping failed: ${e.message}\n`); }
+
+    process.stdout.write(JSON.stringify({ continue: true }));
+  });
+}
+
 switch (mode) {
-  case "context":      emitContext(); break;
-  case "user-prompt":  emitUserPrompt(); break;
+  case "context":       emitContext(); break;
+  case "user-prompt":   emitUserPrompt(); break;
+  case "stop-session":  emitStopSession(); break;
   default:
     console.error(`unknown hook mode: ${mode}`);
     process.exit(1);
